@@ -2,7 +2,7 @@ library(shiny)
 library(ggplot2)
 library(dplyr)
 
-df <- read.csv("data/student-mat.csv", sep = ";")
+df <- read.csv("data/processed/processed_student_mat.csv")
 
 ui <- fluidPage(
   # Page styling
@@ -20,7 +20,7 @@ ui <- fluidPage(
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .card {
-        background-color: #4CAF50;
+        background-color: #435069;
         color: white;
         margin-bottom: 30px;
         border-radius: 12px;
