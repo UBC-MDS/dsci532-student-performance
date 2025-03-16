@@ -21,13 +21,13 @@ To run the app locally, please follow the below instructions.
 1. Clone the repository:
 
 ```{bash}
-git clone https://github.com/yourusername/student-performance-app.git
+git clone https://github.com/UBC-MDS/dsci532-student-performance
 ```
 
 2. Navigate to the cloned repo:
 
 ```{bash}
-cd student-performance-app/src
+cd dsci532-student-performance/src
 ```
 
 2. Install the required packages:
