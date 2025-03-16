@@ -27,18 +27,18 @@ git clone https://github.com/yourusername/student-performance-app.git
 2. Navigate to the cloned repo:
 
 ```{bash}
-cd student-performance-app
+cd student-performance-app/src
 ```
 
 2. Install the required packages:
 ```{r}
-source("src/install_packages.R")
+source("install_packages.R")
 ```
 
 3. Run the app:
 
 ```{bash}
-shiny::runApp("src/app.R")
+shiny::runApp("app.R")
 ```
 
 
