@@ -5,7 +5,6 @@ library(dplyr)
 df <- read.csv("data/processed/processed_student_mat.csv")
 
 ui <- fluidPage(
-  # Page styling
   tags$head(
     tags$style(HTML("
       body {
@@ -65,7 +64,6 @@ ui <- fluidPage(
     "))
   ),
   
-  # UI Layout
   titlePanel("Student Performance - Math"),
   
   sidebarLayout(
@@ -74,11 +72,15 @@ ui <- fluidPage(
       selectInput("gender", "Select Gender:", 
                   choices = c("All", unique(df$sex)), selected = "All"),
       
-      sliderInput("study_time", "Minimum Study Time (hours):", 
-                  min = min(df$studytime), max = max(df$studytime), value = min(df$studytime)),
+      selectInput("study_time", "Select Minimum Study Time (hours):", 
+                  choices = c("All", unique(df$studytime)), selected = "All"),
+      
+      sliderInput("absences", "Select the absences range:", 
+                  min = min(df$absences), max = max(df$absences), 
+                  value = c(min(df$absences), max(df$absences))),
       
       checkboxGroupInput("failures", "Number of Past Failures:", 
-                         choices = unique(df$failures), selected = unique(df$failures)),
+                         choices = c("0", "1", "2", "3"), selected = c("0", "1", "2", "3")),
       
       selectInput("school", "Select School:", 
                   choices = c("All", unique(df$school)), selected = "All"),
@@ -89,7 +91,6 @@ ui <- fluidPage(
     mainPanel(
       class = "main-panel",
       fluidRow(
-        # Summary Cards
         column(4,
                div(class = "card",
                    div(class = "card-title", "Average Grade"),
@@ -104,21 +105,20 @@ ui <- fluidPage(
         ),
         column(4,
                div(class = "card",
-                   div(class = "card-title", "Failures per Student"),
+                   div(class = "card-title", "Average Failures"),
                    div(class = "card-content", textOutput("failures_per_student"))
                )
         )
       ),
       tabsetPanel(
         tabPanel("Grade Distribution", plotOutput("histPlot")),
-        tabPanel("Study Time & Grades", plotOutput("boxPlot"))
+        tabPanel("Previous Grades vs. Final Grade", plotOutput("scatterPlot"))
       )
     )
   )
 )
 
 server <- function(input, output, session) {
-  # Reactive filtering of data
   filtered_data <- reactive({
     data <- df
     if (input$gender != "All") {
@@ -127,19 +127,22 @@ server <- function(input, output, session) {
     if (input$school != "All") {
       data <- data |> filter(school == input$school)
     }
-    data <- data |> filter(studytime >= input$study_time, failures %in% input$failures)
+    if (input$study_time != "All") {
+      data <- data |> filter(studytime == input$study_time)
+    }
+    data <- data |> filter(absences >= input$absences[1] & absences <= input$absences[2],
+                           failures %in% as.numeric(input$failures))
     return(data)
   })
   
-  # Reset Filters
   observeEvent(input$reset, {
     updateSelectInput(session, "gender", selected = "All")
-    updateSliderInput(session, "study_time", value = min(df$studytime))
-    updateCheckboxGroupInput(session, "failures", selected = unique(df$failures))
+    updateSelectInput(session, "study_time", selected = "All")
+    updateSliderInput(session, "absences", value = c(min(df$absences), max(df$absences)))
+    updateCheckboxGroupInput(session, "failures", selected = c("0", "1", "2", "3"))
     updateSelectInput(session, "school", selected = "All")
   })
   
-  # Summary statistics
   output$avg_grade <- renderText({
     data <- filtered_data()
     if (nrow(data) == 0) return("N/A")
@@ -160,7 +163,6 @@ server <- function(input, output, session) {
     round(failures_per_student, 2)
   })
   
-  # Grade Distribution Plot
   output$histPlot <- renderPlot({
     data <- filtered_data()
     if (nrow(data) == 0) return(NULL)
@@ -172,27 +174,26 @@ server <- function(input, output, session) {
         plot.title = element_text(hjust = 0.5, size = 18),
         axis.title = element_text(size = 14),
         axis.text = element_text(size = 12)
-      )
+      ) +
+      xlim(0, 20)  
   })
   
-  # Study Time vs Grades Plot
-  output$boxPlot <- renderPlot({
+  output$scatterPlot <- renderPlot({
     data <- filtered_data()
     if (nrow(data) == 0) return(NULL)
-    ggplot(data, aes(x = factor(studytime), y = G3, fill = factor(studytime))) + 
-      geom_boxplot(outlier.colour = "red", outlier.size = 3) +
-      labs(title = "Study Time vs. Final Grade", x = "Study Time (hours)", y = "Final Grade (G3)") +
+    ggplot(data, aes(x = PrevG, y = G3)) + 
+      geom_point() +  
+      labs(title = "Previous Grades vs. Final Grade", x = "Previous Grade (PrevG)", y = "Final Grade (G3)") +
       theme_minimal() +
       theme(
         plot.title = element_text(hjust = 0.5, size = 18),
         axis.title = element_text(size = 14),
-        axis.text = element_text(size = 12),
-        legend.position = "none"
+        axis.text = element_text(size = 12)
       ) +
-      scale_fill_brewer(palette = "Set3")
+      scale_color_viridis_c() +
+      xlim(0, 20) +
+      ylim(0, 20) 
   })
 }
 
 shinyApp(ui = ui, server = server)
-
-

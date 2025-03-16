@@ -10,8 +10,14 @@ if (!dir.exists(output_dir)) {
 
 df <- read.csv(input_file, sep = ";")
 
+df <- df |> 
+  mutate(sex = recode(sex, "F" = "Female", "M" = "Male"))
+
+df <- df |> 
+  mutate(PrevG = (G1 + G2) / 2)
+
 df_processed <- df |> 
-  select(school, sex, age, studytime, failures, G3)
+  select(school, sex, age, studytime, failures, PrevG, absences, G3)
 
 
 write.csv(df_processed, output_file, row.names = FALSE)

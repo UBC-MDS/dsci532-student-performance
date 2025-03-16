@@ -12,6 +12,10 @@ Understanding student performance is important for improving educational outcome
 
 Please watch the following video for detailed description of the app.
 
+<video width="900" controls>
+  <source src="docs/video_explanation.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Installation Instructions
 
@@ -30,7 +34,9 @@ cd student-performance-app
 ```
 
 2. Install the required packages:
-
+```{r}
+source("src/install_packages.R")
+```
 
 3. Run the app:
 
@@ -38,3 +44,7 @@ cd student-performance-app
 shiny::runApp("src/app.R")
 ```
 
+
+## Challenging
+
+For the challenging portion, I added more input/output components. In total, the dashboard has 10 components. 5 Inputs, 3 Summary Cards and 2 Plots.
