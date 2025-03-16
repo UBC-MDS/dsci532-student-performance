@@ -13,7 +13,7 @@ Understanding student performance is important for improving educational outcome
 Please watch the following video for detailed description of the app.
 
 <video width="900" controls>
-  <source src="docs/video_explanation.mp4" type="video/mp4">
+  <source src="video_explanation.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
